@@ -1,4 +1,4 @@
-from brownie import *
+from brownie import interface, accounts, Contract, MyStrategy, Controller, SettV3
 from config import (
   BADGER_DEV_MULTISIG,
   WANT,
@@ -80,15 +80,51 @@ def deploy():
   controller.approveStrategy(WANT, strategy, {"from": governance})
   controller.setStrategy(WANT, strategy, {"from": deployer})
 
+  WBTC = "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"
+  wbtc = interface.IERC20(WBTC)
+  amWBTC = "0x5c2ed810328349100A66B82b78a1791B101C9D61"
+  amwbtc = interface.IERC20(amWBTC)
+  atriCryptoLP = "0x8096ac61db23291252574D49f036f0f9ed8ab390"
+  want = interface.IERC20(atriCryptoLP)
+
   ## Uniswap some tokens here
-  router = Contract.from_explorer("0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D")
+  router = Contract.from_explorer("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
+  
+  wbtc.approve("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
+                999999999999999999999999999999, {"from": deployer})
+
+  # Buy WBTC with path MATIC -> WETH -> WBTC
   router.swapExactETHForTokens(
-    0, ## Mint out
-    ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", WANT],
-    deployer,
-    9999999999999999,
-    {"from": deployer, "value": 5000000000000000000}
+      0,
+      ["0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+          "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619", WBTC],
+      deployer,
+      9999999999999999,
+      {"from": deployer, "value": 5000 * 10**18}
   )
+
+  # AAVE lending pool
+  lendingPool = Contract.from_explorer("0x8dFf5E27EA6b7AC08EbFdf9eB090F32ee9a30fcf")
+  wbtc.approve("0x8dFf5E27EA6b7AC08EbFdf9eB090F32ee9a30fcf",
+                999999999999999999999999999999, {"from": deployer})
+
+  # Deposit wBTC on Lending pool to obtain amWBTC
+  lendingPool.deposit(WBTC, wbtc.balanceOf(deployer), deployer.address, 0, {"from": deployer})
+
+  # CURVE_USEDBTCETH_POOL
+  pool = Contract.from_explorer("0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36")
+  amwbtc.approve("0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36",
+                999999999999999999999999999999, {"from": deployer})
+
+  # Add liquidity for aTricrypto pool with amWBTC
+  pool.add_liquidity(
+      [0, amwbtc.balanceOf(deployer), 0], # amUSD, amWBTC, amWETTH
+      0,
+      {"from": deployer}
+  )
+
+  assert want.balanceOf(deployer.address) > 0
+  print("Initial Want Balance: ", want.balanceOf(deployer.address))
 
   return DotMap(
     deployer=deployer,
