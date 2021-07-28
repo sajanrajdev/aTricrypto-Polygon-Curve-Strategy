@@ -1,5 +1,6 @@
 from helpers.StrategyCoreResolver import StrategyCoreResolver
 from rich.console import Console
+from brownie import interface
 
 console = Console()
 
@@ -37,17 +38,26 @@ class StrategyResolver(StrategyCoreResolver):
             "sett.pricePerFullShare"
         )
 
-        # # Strategist should earn if fee is enabled and value was generated
-        # if before.get("strategy.performanceFeeStrategist") > 0 and valueGained:
-        #     assert after.balances("want", "strategist") > before.balances(
-        #         "want", "strategist"
-        #     )
+        # Strategist should earn if fee is enabled and value was generated
+        if before.get("strategy.performanceFeeStrategist") > 0 and valueGained:
+            assert after.balances("want", "strategist") > before.balances(
+                "want", "strategist"
+            )
 
-        # # Strategist should earn if fee is enabled and value was generated
-        # if before.get("strategy.performanceFeeGovernance") > 0 and valueGained:
-        #     assert after.balances("want", "governanceRewards") > before.balances(
-        #         "want", "governanceRewards"
-        #     )
+        # Strategist should earn if fee is enabled and value was generated
+        if before.get("strategy.performanceFeeGovernance") > 0 and valueGained:
+            assert after.balances("want", "governanceRewards") > before.balances(
+                "want", "governanceRewards"
+            )
+        if valueGained:
+            assert after.get("strategy.balanceOfPool") > before.get(
+                "strategy.balanceOfPool"
+            )
+            assert after.balances("crv", "badgerTree") > before.balances(
+                "crv", "badgerTree"
+            )
+
+        
 
     def confirm_tend(self, before, after, tx):
         """
@@ -57,18 +67,64 @@ class StrategyResolver(StrategyCoreResolver):
 
         (Strategy Must Implement)
         """
-        assert True
+        # Tend only produces results if balance of want in strategy is > 0
+        if before.get("strategy.balanceOfWant") > 0:
+            # Check that balance of want on strategy goes to 0 after tend
+            assert after.get("strategy.balanceOfWant") == 0
+
+            # Amount deposited in pool must have increased
+            assert after.get("strategy.balanceOfPool") > before.get("strategy.balanceOfPool")
 
     def get_strategy_destinations(self):
         """
         Track balances for all strategy implementations
         (Strategy Must Implement)
         """
-        # E.G
-        # strategy = self.manager.strategy
-        # return {
-        #     "gauge": strategy.gauge(),
-        #     "mintr": strategy.mintr(),
-        # }
+        strategy = self.manager.strategy
+        return {
+            "gauge": strategy.CURVE_USDBTCETH_GAUGE(),
+            "pool": strategy.CURVE_USEDBTCETH_POOL(),
+            "badgerTree": strategy.badgerTree(),
+        }   
 
-        return {}
+    def add_balances_snap(self, calls, entities):
+        super().add_balances_snap(calls, entities)
+        strategy = self.manager.strategy
+
+        crv = interface.IERC20(strategy.CRV_TOKEN())
+        wbtc = interface.IERC20(strategy.wBTC_TOKEN())
+        wMATIC = interface.IERC20("0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270")
+
+        calls = self.add_entity_balances_for_tokens(calls, "crv", crv, entities)
+        calls = self.add_entity_balances_for_tokens(calls, "wbtc", wbtc, entities)
+        calls = self.add_entity_balances_for_tokens(calls, "wMATIC", wMATIC, entities)
+
+    def confirm_harvest_state(self, before, after, tx):
+        key = "Harvest"
+        if key in tx.events:
+            event = tx.events[key][0]
+            keys = [
+                "harvested",
+            ]
+            for key in keys:
+                assert key in event
+
+            console.print("[blue]== harvest() Harvest State ==[/blue]")
+            self.printState(event, keys)
+
+        key = "TreeDistribution"
+        if key in tx.events:
+            event = tx.events[key][0]
+            keys = [
+                "token",
+                "amount",
+            ]
+            for key in keys:
+                assert key in event
+
+            console.print("[blue]== harvest() TreeDistribution State ==[/blue]")
+            self.printState(event, keys)
+
+    def printState(self, event, keys):
+        for key in keys:
+            print(key, ": ", event[key])

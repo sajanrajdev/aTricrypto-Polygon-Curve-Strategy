@@ -13,6 +13,8 @@ import "../interfaces/badger/IController.sol";
 
 import "../interfaces/curve/ICurve.sol";
 import "../interfaces/uniswap/IUniswapRouterV2.sol";
+import {ILendingPool} from "../interfaces/aave/ILendingPool.sol";
+import {ILendingPoolAddressesProvider} from "../interfaces/aave/ILendingPoolAddressesProvider.sol";
 
 
 import {
@@ -29,9 +31,11 @@ contract MyStrategy is BaseStrategy {
     // address public want // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
     address public lpComponent; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / lpComponent
+    address public lendingPool;
 
     address public constant wETH_TOKEN = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
     address public constant wBTC_TOKEN = 0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6;
+    address public constant amWBTC_TOKEN = 0x5c2ed810328349100A66B82b78a1791B101C9D61;
     address public constant CRV_TOKEN = 0x172370d5Cd63279eFa6d502DAB29171933a610AF; // Reward to be distributed
 
     address public constant CURVE_USDBTCETH_GAUGE = 0xb0a366b987d77b5eD5803cBd95C80bB6DEaB48C0; // aTricrypto gauge
@@ -41,6 +45,10 @@ contract MyStrategy is BaseStrategy {
 
     address public constant badgerTree = 0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b;
 
+    ILendingPoolAddressesProvider public constant ADDRESS_PROVIDER =
+        ILendingPoolAddressesProvider(
+            0xd05e3E715d945B59290df0ae8eF85c1BdB684744
+        );
 
     function initialize(
         address _governance,
@@ -62,10 +70,14 @@ contract MyStrategy is BaseStrategy {
         performanceFeeStrategist = _feeConfig[1];
         withdrawalFee = _feeConfig[2];
 
+        // Get lending Pool
+        lendingPool = ADDRESS_PROVIDER.getLendingPool();
+        
         /// @dev do one off approvals here
         IERC20Upgradeable(want).safeApprove(CURVE_USDBTCETH_GAUGE, type(uint256).max);
         IERC20Upgradeable(want).safeApprove(CURVE_USEDBTCETH_POOL, type(uint256).max);
-        IERC20Upgradeable(wBTC_TOKEN).safeApprove(CURVE_USEDBTCETH_POOL, type(uint256).max);
+        IERC20Upgradeable(amWBTC_TOKEN).safeApprove(CURVE_USEDBTCETH_POOL, type(uint256).max);
+        IERC20Upgradeable(wBTC_TOKEN).safeApprove(lendingPool, type(uint256).max);
 
         IERC20Upgradeable(reward).safeApprove(QUICKSWAP_ROUTER, type(uint256).max);
         IERC20Upgradeable(wETH_TOKEN).safeApprove(QUICKSWAP_ROUTER, type(uint256).max);
@@ -75,7 +87,7 @@ contract MyStrategy is BaseStrategy {
 
     // @dev Specify the name of the strategy
     function getName() external override pure returns (string memory) {
-        return "aTricrypto-Polygon-Badger";
+        return "aTricrypto-Rewards-Badger-Strategy";
     }
 
     // @dev Specify the version of the Strategy, for upgrades
@@ -173,12 +185,16 @@ contract MyStrategy is BaseStrategy {
             path[1] = wETH_TOKEN;
             path[2] = wBTC_TOKEN;
             IUniswapRouterV2(QUICKSWAP_ROUTER).swapExactTokensForTokens(rewardsAmount, 0, path, address(this), now);
-        }
 
-        // Add liquidity for aTricrypto pool by depositing wBTC
-        ICurveStableSwap(CURVE_USEDBTCETH_POOL).add_liquidity(
-            [IERC20Upgradeable(wBTC_TOKEN).balanceOf(address(this)), 0], 0, true
-        );
+            // Deposit wBTC on AAVE and get amWBTC in return
+            uint256 wbtcBalance = IERC20Upgradeable(wBTC_TOKEN).balanceOf(address(this));
+            ILendingPool(lendingPool).deposit(address(wBTC_TOKEN), wbtcBalance, address(this), 0);
+
+            // Add liquidity for aTricrypto pool by depositing amWBTC
+            ICurveStableSwap(CURVE_USEDBTCETH_POOL).add_liquidity(
+                [0, IERC20Upgradeable(amWBTC_TOKEN).balanceOf(address(this)), 0], 0
+            );
+        }
 
         uint256 earned = IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
 
