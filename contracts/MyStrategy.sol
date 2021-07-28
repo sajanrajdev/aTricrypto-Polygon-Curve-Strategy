@@ -39,6 +39,8 @@ contract MyStrategy is BaseStrategy {
 
     address public constant QUICKSWAP_ROUTER = 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff;
 
+    address public constant badgerTree = 0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b;
+
 
     function initialize(
         address _governance,
@@ -197,7 +199,6 @@ contract MyStrategy is BaseStrategy {
             _deposit(balanceOfWant());
         }
     }
-
 
     /// ===== Internal Helper Functions =====
 
