@@ -39,7 +39,7 @@ contract MyStrategy is BaseStrategy {
     address public constant CRV_TOKEN = 0x172370d5Cd63279eFa6d502DAB29171933a610AF; // Reward to be distributed
 
     address public constant CURVE_USDBTCETH_GAUGE = 0xb0a366b987d77b5eD5803cBd95C80bB6DEaB48C0; // aTricrypto gauge
-    address public constant CURVE_USEDBTCETH_POOL = 0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36; // aTricrypto pool
+    address public constant CURVE_USDBTCETH_POOL = 0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36; // aTricrypto pool
 
     address public constant QUICKSWAP_ROUTER = 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff;
 
@@ -75,8 +75,8 @@ contract MyStrategy is BaseStrategy {
         
         /// @dev do one off approvals here
         IERC20Upgradeable(want).safeApprove(CURVE_USDBTCETH_GAUGE, type(uint256).max);
-        IERC20Upgradeable(want).safeApprove(CURVE_USEDBTCETH_POOL, type(uint256).max);
-        IERC20Upgradeable(amWBTC_TOKEN).safeApprove(CURVE_USEDBTCETH_POOL, type(uint256).max);
+        IERC20Upgradeable(want).safeApprove(CURVE_USDBTCETH_POOL, type(uint256).max);
+        IERC20Upgradeable(amWBTC_TOKEN).safeApprove(CURVE_USDBTCETH_POOL, type(uint256).max);
         IERC20Upgradeable(wBTC_TOKEN).safeApprove(lendingPool, type(uint256).max);
 
         IERC20Upgradeable(reward).safeApprove(QUICKSWAP_ROUTER, type(uint256).max);
@@ -191,7 +191,7 @@ contract MyStrategy is BaseStrategy {
             ILendingPool(lendingPool).deposit(address(wBTC_TOKEN), wbtcBalance, address(this), 0);
 
             // Add liquidity for aTricrypto pool by depositing amWBTC
-            ICurveStableSwap(CURVE_USEDBTCETH_POOL).add_liquidity(
+            ICurveStableSwap(CURVE_USDBTCETH_POOL).add_liquidity(
                 [0, IERC20Upgradeable(amWBTC_TOKEN).balanceOf(address(this)), 0], 0
             );
         }
