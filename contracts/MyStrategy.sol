@@ -172,11 +172,18 @@ contract MyStrategy is BaseStrategy {
             return 0;
         }
 
-        // Send CRV rewards to BadgerTree
+        // Process CRV rewards if existing
         if (crvAmount > 0) {
-            IERC20Upgradeable(CRV_TOKEN).safeTransfer(badgerTree, crvAmount);
-            emit TreeDistribution(CRV_TOKEN, crvAmount, block.number, block.timestamp);
+            // Process fees on CRV Rewards
+            _processRewardsFees(crvAmount, CRV_TOKEN);
+
+            // Transfer balance of CRV to the Badger Tree
+            uint256 crvBalance = IERC20Upgradeable(CRV_TOKEN).balanceOf(address(this));
+            IERC20Upgradeable(CRV_TOKEN).safeTransfer(badgerTree, crvBalance);
+
+            emit TreeDistribution(CRV_TOKEN, crvBalance, block.number, block.timestamp);
         }
+
 
         // Swap rewarded wMATIC for wBTC through wETH path
         if (rewardsAmount > 0) {
@@ -224,4 +231,12 @@ contract MyStrategy is BaseStrategy {
 
         strategistPerformanceFee = _processFee(want, _amount, performanceFeeStrategist, strategist);
     }
+
+    /// @dev used to manage the governance and strategist fee on earned rewards, make sure to use it to get paid!
+    function _processRewardsFees(uint256 _amount, address token) internal returns (uint256 governanceRewardsFee, uint256 strategistRewardsFee) {
+        governanceRewardsFee = _processFee(token, _amount, performanceFeeGovernance, IController(controller).rewards());
+
+        strategistRewardsFee = _processFee(token, _amount, performanceFeeStrategist, strategist);
+    }
+
 }
