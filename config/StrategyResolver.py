@@ -49,6 +49,13 @@ class StrategyResolver(StrategyCoreResolver):
             assert after.balances("want", "governanceRewards") > before.balances(
                 "want", "governanceRewards"
             )
+
+        if valueGained:
+            # If wMATIC is harvested, want is compounded into the strategy
+            assert after.balances("want", "strategy") > before.balances(
+                "want", "strategy"
+            )
+            assert after.get("sett.balance") > before.get("sett.balance")
         
 
     def confirm_tend(self, before, after, tx):
@@ -75,7 +82,7 @@ class StrategyResolver(StrategyCoreResolver):
         strategy = self.manager.strategy
         return {
             "gauge": strategy.CURVE_USDBTCETH_GAUGE(),
-            "pool": strategy.CURVE_USEDBTCETH_POOL(),
+            "pool": strategy.CURVE_USDBTCETH_POOL(),
             "badgerTree": strategy.badgerTree(),
         }   
 
@@ -118,6 +125,16 @@ class StrategyResolver(StrategyCoreResolver):
 
             console.print("[blue]== harvest() TreeDistribution State ==[/blue]")
             self.printState(event, keys)
+
+            # If CRV is harvested, it is distributed to the tree
+            assert after.balances("crv", "badgerTree") > before.balances(
+                "crv", "badgerTree"
+            )
+            # All CRV harvested is sent to the tree
+            assert (
+                after.balances("crv", "badgerTree") - before.balances("crv", "badgerTree") ==
+                event["amount"]
+            )
 
     def printState(self, event, keys):
         for key in keys:

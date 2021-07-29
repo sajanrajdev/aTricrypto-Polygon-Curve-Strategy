@@ -109,7 +109,7 @@ def deploy():
   # Deposit wBTC on Lending pool to obtain amWBTC
   lendingPool.deposit(WBTC, wbtc.balanceOf(deployer), deployer.address, 0, {"from": deployer})
 
-  # CURVE_USEDBTCETH_POOL
+  # CURVE_USDBTCETH_POOL
   pool = Contract.from_explorer("0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36")
   amwbtc.approve("0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36",
                 999999999999999999999999999999, {"from": deployer})
