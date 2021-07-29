@@ -1,21 +1,36 @@
-# Badger Strategy V1 Brownie Mix
+# Polygon Curve aTricrypto Liquidity Pool Yield Strategy
 
-- Video Introduction: https://youtu.be/FVbhgPYW_D0
+## NOTE: TO TEST
+Import the fork network with tons of ETH
+```
+brownie networks import network-config.yaml
+```
 
-- Example Project: https://github.com/Badger-Finance/wBTC-AAVE-Rewards-Farm-Badger-V1-Strategy
-- Full Project Walkthrough: https://www.youtube.com/watch?v=lTb0RFJJx2k
-- 1-1 Mentoring (Valid throughout HackMoney and Gitcoin Round 10): https://calendly.com/alex-entreprenerd/badger-hackmoney-1-1
+This Polygon network strategy takes Curve's aTricrypto liquidity pool tokens as deposit and stakes it on Curve for yield. The rewards are in wMATIC and CRV. The wMATIC is swapped for wBTC, deposited on AAVE of amWBTC, and then deposited on the aTricrypto pool. The CRV rewards are distributed to users through the BadgerTree. 
 
-## What you'll find here
+## Deposit
+Deposit aTricrypto liquidity pool tokens in Curve's gauge, so that we earn interest as well as rewards in WMATIC and CRV.
 
-- Basic Solidity Smart Contract for creating your own Badger Strategy ([`contracts/MyStrategy.sol`](contracts/MyStrategy.sol))
+## Tend
+If there's any aTricrypto in the strategy, it will be deposited in the pool.
 
-- Interfaces for some of the most used DeFi protocols on ethereum mainnet. ([`interfaces`](interfaces))
-- Dependencies for OpenZeppelin and other libraries. ([`deps`](deps))
+## Harvest
+The Strategy will harvest WMATIC, then swap it into wBTC, deposit it on AAVE for amWBTC, which is then added to Curve's aTricrypto liquidity pool. Additionally, the strategy will harvest CRV rewards that will forward to users through the BadgerTree.
 
-- Sample test suite that runs on mainnet fork. ([`tests`](tests))
+In further detail:
+If no reward, then do nothing.
+If CRV reward is available, deposit on BadgerTree.
+If WMATIC reward is available, swap for WBTC, deposit on AAVE for amWBTC.
+Finally, deposit any amWBTC to Curve's aTricrypto liquidity pool.
 
-This mix is configured for use with [Ganache](https://github.com/trufflesuite/ganache-cli) on a [forked mainnet](https://eth-brownie.readthedocs.io/en/stable/network-management.html#using-a-forked-development-network).
+
+## Expected Yield as of July 29th, 2021
+
+BASE:   5.46%
+CRV:    9.53%
+WMATIC: 9.30%
+
+Total:  24.29%
 
 ## Installation and Setup
 
