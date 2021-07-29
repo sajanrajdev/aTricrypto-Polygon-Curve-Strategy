@@ -180,7 +180,7 @@ contract MyStrategy is BaseStrategy {
 
         // Swap rewarded wMATIC for wBTC through wETH path
         if (rewardsAmount > 0) {
-            address[] memory path = new address[](2);
+            address[] memory path = new address[](3);
             path[0] = reward;
             path[1] = wETH_TOKEN;
             path[2] = wBTC_TOKEN;
