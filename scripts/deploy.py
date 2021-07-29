@@ -84,8 +84,6 @@ def deploy():
   wbtc = interface.IERC20(WBTC)
   amWBTC = "0x5c2ed810328349100A66B82b78a1791B101C9D61"
   amwbtc = interface.IERC20(amWBTC)
-  atriCryptoLP = "0x8096ac61db23291252574D49f036f0f9ed8ab390"
-  want = interface.IERC20(atriCryptoLP)
 
   ## Uniswap some tokens here
   router = Contract.from_explorer("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
