@@ -15,11 +15,11 @@ Deposit aTricrypto liquidity pool tokens in Curve's gauge, so that we earn inter
 If there's any aTricrypto in the strategy, it will be deposited in the pool.
 
 ## Harvest
-The Strategy will harvest WMATIC, then swap it into wBTC, deposit it on AAVE for amWBTC, which is then added to Curve's aTricrypto liquidity pool. Additionally, the strategy will harvest CRV rewards that will forward to users through the BadgerTree.
+The Strategy will harvest WMATIC, then swap it into wBTC, deposit it on AAVE for amWBTC, which is then added to Curve's aTricrypto liquidity pool. Additionally, the strategy will harvest CRV rewards that will be forward to users through the BadgerTree.
 
 In further detail:
 If no reward, then do nothing.
-If CRV reward is available, deposit on BadgerTree.
+If CRV reward is available, process fees on it and deposit the balance on BadgerTree.
 If WMATIC reward is available, swap for WBTC, deposit on AAVE for amWBTC.
 Finally, deposit any amWBTC to Curve's aTricrypto liquidity pool.
 
