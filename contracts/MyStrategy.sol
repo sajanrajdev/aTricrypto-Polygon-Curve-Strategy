@@ -107,10 +107,15 @@ contract MyStrategy is BaseStrategy {
 
     // @dev These are the tokens that cannot be moved except by the vault
     function getProtectedTokens() public override view returns (address[] memory) {
-        address[] memory protectedTokens = new address[](3);
+        address[] memory protectedTokens = new address[](6);
         protectedTokens[0] = want;
         protectedTokens[1] = lpComponent;
         protectedTokens[2] = reward;
+
+        protectedTokens[3] = CRV_TOKEN;
+        protectedTokens[4] = amWBTC_TOKEN;
+        protectedTokens[5] = wBTC_TOKEN;
+
         return protectedTokens;
     }
 
