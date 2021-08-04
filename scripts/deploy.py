@@ -1,4 +1,4 @@
-from brownie import interface, accounts, Contract, MyStrategy, Controller, SettV3
+from brownie import interface, accounts, Contract, StrategyCurveBadgerATricrypto, Controller, SettV3
 from config import (
   BADGER_DEV_MULTISIG,
   WANT,
