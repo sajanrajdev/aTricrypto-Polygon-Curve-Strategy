@@ -131,11 +131,11 @@ Set these up in `/config/__init__.py` this mix will automatically be set up for 
 [`contracts/MyStrategy.sol`](contracts/MyStrategy.sol) is where you implement your own logic for your strategy. In particular:
 
 * Customize the `initialize` Method
-* Set a name in `MyStrategy.getName()`
-* Set a version in `MyStrategy.version()`
-* Write a way to calculate the want invested in `MyStrategy.balanceOfPool()`
-* Write a method that returns true if the Strategy should be tended in `MyStrategy.isTendable()`
-* Set a version in `MyStrategy.version()`
+* Set a name in `StrategyCurveBadgerATricrypto.getName()`
+* Set a version in `StrategyCurveBadgerATricrypto.version()`
+* Write a way to calculate the want invested in `StrategyCurveBadgerATricrypto.balanceOfPool()`
+* Write a method that returns true if the Strategy should be tended in `StrategyCurveBadgerATricrypto.isTendable()`
+* Set a version in `StrategyCurveBadgerATricrypto.version()`
 * Invest your want tokens via `Strategy._deposit()`.
 * Take profits and repay debt via `Strategy.harvest()`.
 * Unwind enough of your position to payback withdrawals via `Strategy._withdrawSome()`.

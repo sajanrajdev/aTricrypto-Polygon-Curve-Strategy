@@ -57,7 +57,7 @@ def deploy():
   # sett.setGuestList(guestList, {"from": governance})
 
   ## Start up Strategy
-  strategy = MyStrategy.deploy({"from": deployer})
+  strategy = StrategyCurveBadgerATricrypto.deploy({"from": deployer})
   strategy.initialize(
     BADGER_DEV_MULTISIG,
     strategist,

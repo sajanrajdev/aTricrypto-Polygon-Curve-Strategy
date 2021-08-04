@@ -21,7 +21,7 @@ import {
     BaseStrategy
 } from "../deps/BaseStrategy.sol";
 
-contract MyStrategy is BaseStrategy {
+contract StrategyCurveBadgerATricrypto is BaseStrategy {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
     using SafeMathUpgradeable for uint256;
