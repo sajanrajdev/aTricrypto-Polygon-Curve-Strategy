@@ -72,7 +72,7 @@ contract StrategyCurveBadgerATricrypto is BaseStrategy {
 
         // Get lending Pool
         lendingPool = ADDRESS_PROVIDER.getLendingPool();
-        
+    
         /// @dev do one off approvals here
         IERC20Upgradeable(want).safeApprove(CURVE_USDBTCETH_GAUGE, type(uint256).max);
         IERC20Upgradeable(want).safeApprove(CURVE_USDBTCETH_POOL, type(uint256).max);
@@ -87,7 +87,7 @@ contract StrategyCurveBadgerATricrypto is BaseStrategy {
 
     // @dev Specify the name of the strategy
     function getName() external override pure returns (string memory) {
-        return "aTricrypto-Rewards-Badger-Strategy";
+        return "StrategyCurveBadgerATricrypto";
     }
 
     // @dev Specify the version of the Strategy, for upgrades
