@@ -211,7 +211,7 @@ contract StrategyCurveBadgerATricrypto is BaseStrategy {
         uint256 earned = IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
 
         /// @notice Keep this in so you get paid!
-        (uint256 governancePerformanceFee, uint256 strategistPerformanceFee) = _processPerformanceFees(earned);
+        _processPerformanceFees(earned);
 
         /// @dev Harvest event that every strategy MUST have, see BaseStrategy
         emit Harvest(earned, block.number);
