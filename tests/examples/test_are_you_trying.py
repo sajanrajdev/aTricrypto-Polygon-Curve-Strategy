@@ -25,13 +25,14 @@ def test_are_you_trying(deployer, sett, strategy, want):
 
   sett.earn({"from": deployer})
 
-  chain.mine(10000) # Mine so we get some interest
-
   ## TEST 1: Does the want get used in any way?
   assert want.balanceOf(sett) == depositAmount - available
 
   # Did the strategy do something with the asset?
   assert want.balanceOf(strategy) < available
+
+  chain.sleep(10000 * 13) # Mine so we get some interest
+
 
   # Use this if it should invest all
   # assert want.balanceOf(strategy) == 0
@@ -44,6 +45,3 @@ def test_are_you_trying(deployer, sett, strategy, want):
   event = harvest.events["Harvest"]
   # If it doesn't print, we don't want it
   assert event["harvested"] > 0
-
-
-  

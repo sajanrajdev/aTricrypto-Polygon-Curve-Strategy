@@ -18,19 +18,20 @@ If there's any aTricrypto in the strategy, it will be deposited in the pool.
 The Strategy will harvest WMATIC, then swap it into wBTC, deposit it on AAVE for amWBTC, which is then added to Curve's aTricrypto liquidity pool. Additionally, the strategy will harvest CRV rewards that will be forward to users through the BadgerTree.
 
 In further detail:
-If no reward, then do nothing.
-If CRV reward is available, process fees on it and deposit the balance on BadgerTree.
-If WMATIC reward is available, swap for WBTC, deposit on AAVE for amWBTC.
-Finally, deposit any amWBTC to Curve's aTricrypto liquidity pool.
+- If no reward, then do nothing.
+- If CRV reward is available, process fees on it and deposit the balance on BadgerTree.
+- If WMATIC reward is available, swap for WBTC, deposit on AAVE for amWBTC.
+- Deposit any amWBTC to Curve's aTricrypto liquidity pool.
+- Finally, fees are processed on the want obtained.
 
 
 ## Expected Yield as of July 29th, 2021
 
-BASE:   5.46%
-CRV:    9.53%
-WMATIC: 9.30%
+- BASE:   5.46%
+- CRV:    9.53%
+- WMATIC: 9.30%
 
-Total:  24.29%
+- Total:  24.29%
 
 ## Installation and Setup
 

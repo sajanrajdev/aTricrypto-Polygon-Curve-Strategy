@@ -86,7 +86,7 @@ def deploy():
   amwbtc = interface.IERC20(amWBTC)
 
   ## Uniswap some tokens here
-  router = Contract.from_explorer("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
+  router = interface.IUniswapRouterV2("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
   
   wbtc.approve("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
                 999999999999999999999999999999, {"from": deployer})
@@ -102,7 +102,7 @@ def deploy():
   )
 
   # AAVE lending pool
-  lendingPool = Contract.from_explorer("0x8dFf5E27EA6b7AC08EbFdf9eB090F32ee9a30fcf")
+  lendingPool = interface.ILendingPool("0x8dFf5E27EA6b7AC08EbFdf9eB090F32ee9a30fcf")
   wbtc.approve("0x8dFf5E27EA6b7AC08EbFdf9eB090F32ee9a30fcf",
                 999999999999999999999999999999, {"from": deployer})
 
@@ -110,7 +110,7 @@ def deploy():
   lendingPool.deposit(WBTC, wbtc.balanceOf(deployer), deployer.address, 0, {"from": deployer})
 
   # CURVE_USDBTCETH_POOL
-  pool = Contract.from_explorer("0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36")
+  pool = interface.ICurveStableSwap("0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36")
   amwbtc.approve("0x751B1e21756bDbc307CBcC5085c042a0e9AaEf36",
                 999999999999999999999999999999, {"from": deployer})
 
